@@ -23,8 +23,11 @@ table1_grouped = table1_df['HINCP'].groupby(table1_df['HHT'])
 
 def get_table1(group):
     return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min()}
+    #return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min(),'max':group.max()}
 
+# Apply
 table1 = table1_grouped.apply(get_table1)
+
 # Convert HHT types to text descriptions
 hht_text_descriptions =  {
 1.0:'Married couple household',
@@ -39,8 +42,13 @@ table1.rename(index=hht_text_descriptions, inplace=True)
 
 # unstack groupby into dataframe
 table1_table = table1.unstack(level=-1)
-
+# Sort by mean column descending
+table1_table.sort_values('mean',ascending=False, inplace=True)
 print(table1_table)
+
+
+
+
 # TABLE 2: HHL vs. ACCESS
 # TODO Table should use the HHL types (text descriptions) as the index
 # TODO Columns should be the text descriptions of ACCESS values
