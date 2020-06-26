@@ -16,29 +16,31 @@ pd.set_option('display.width',1000)
 pums_dataframe = pd.read_csv('ss13hil.csv')
 
 # TABLE 1: Statistics of HINCP, grouped by HHT
-# split HINCP values by HHT
-table1_dataframe = pums_dataframe['HINCP'].groupby(pums_dataframe['HHT'])
-def get_table_1_stats(group):
-    # Get mean, std, count, min, max
-    return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min(),'max':group.max(),}
+# Get df for table1
+table1_df = pums_dataframe[['HINCP','HHT']].dropna()
+# Get grouped
+table1_grouped = table1_df['HINCP'].groupby(table1_df['HHT'])
 
-table1 = table1_dataframe.apply(get_table_1_stats)
+def get_table1(group):
+    return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min()}
+
+table1 = table1_grouped.apply(get_table1)
 # Convert HHT types to text descriptions
 hht_text_descriptions =  {
 1.0:'Married couple household',
-2.0:'Nonfamily household:Male householder:Not living alone',
-3.0:'Nonfamily household:Female householder:Not living alone',
-4.0:'Other family household:Male householder, no wife present',
-5.0:'Other family household:Female householder, no husband present',
-6.0:'Nonfamily household:Male householder:Living alone',
-7.0:'Nonfamily household:Female householder:Living alone'}
+5.0:'Nonfamily household:Male householder:Not living alone',
+7.0:'Nonfamily household:Female householder:Not living alone',
+2.0:'Other family household:Male householder, no wife present',
+3.0:'Other family household:Female householder, no husband present',
+4.0:'Nonfamily household:Male householder:Living alone',
+6.0:'Nonfamily household:Female householder:Living alone'}
 
-table1.rename(index = hht_text_descriptions,inplace=True)
+table1.rename(index=hht_text_descriptions, inplace=True)
 
-#table1.sort_values(ascending=False,inplace=True)
+# unstack groupby into dataframe
+table1_table = table1.unstack(level=-1)
 
-print(table1)
-
+print(table1_table)
 # TABLE 2: HHL vs. ACCESS
 # TODO Table should use the HHL types (text descriptions) as the index
 # TODO Columns should be the text descriptions of ACCESS values
