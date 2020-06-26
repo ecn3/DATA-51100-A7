@@ -5,7 +5,7 @@
 
 # Import Statements
 import pandas as pd
-from pandas import DataFrame
+from pandas import Series, DataFrame
 import numpy as np
 
 # Output formating
@@ -16,9 +16,28 @@ pd.set_option('display.width',1000)
 pums_dataframe = pd.read_csv('ss13hil.csv')
 
 # TABLE 1: Statistics of HINCP, grouped by HHT
-# TODO Table should use the HHT types (text descriptions) as the index
-# TODO Columns should be: mean, std, count, min, max
-# TODO Rows should be sorted by the mean column value in descending order
+# split HINCP values by HHT
+table1_dataframe = pums_dataframe['HINCP'].groupby(pums_dataframe['HHT'])
+def get_table_1_stats(group):
+    # Get mean, std, count, min, max
+    return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min(),'max':group.max(),}
+
+table1 = table1_dataframe.apply(get_table_1_stats)
+# Convert HHT types to text descriptions
+hht_text_descriptions =  {
+1.0:'Married couple household',
+2.0:'Nonfamily household:Male householder:Not living alone',
+3.0:'Nonfamily household:Female householder:Not living alone',
+4.0:'Other family household:Male householder, no wife present',
+5.0:'Other family household:Female householder, no husband present',
+6.0:'Nonfamily household:Male householder:Living alone',
+7.0:'Nonfamily household:Female householder:Living alone'}
+
+table1.rename(index = hht_text_descriptions,inplace=True)
+
+#table1.sort_values(ascending=False,inplace=True)
+
+print(table1)
 
 # TABLE 2: HHL vs. ACCESS
 # TODO Table should use the HHL types (text descriptions) as the index
@@ -38,15 +57,15 @@ Entries need to be formatted as percentages.
 
 # Display the tables to the screen
 # Header info
-print("DATA-51100-002, SUMMER 2020")
-print("Christian Nelson")
-print("PROGRAMMING ASSIGNMENT #7\n")
+#print("DATA-51100-002, SUMMER 2020")
+#print("Christian Nelson")
+#print("PROGRAMMING ASSIGNMENT #7\n")
 
 # Table 1
-print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***\n")
+#print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***\n")
 
 # Table 2
-print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
+#print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
 
 # Table 3
-print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***\n")
+#print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***\n")
