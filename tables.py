@@ -11,6 +11,7 @@ import numpy as np
 # Output formating
 pd.options.display.max_colwidth = 100
 
+
 # Load ss13hil.csv into a DATAFRAME
 pums_df = pd.read_csv('ss13hil.csv')
 
@@ -80,7 +81,7 @@ access_text_descriptions =  {
 table2_grouped =  table2_df.groupby(['HHL','ACCESS'])['WGTP']
 
 def get_table_sums(group):
-    return {'sum':group.sum()}
+    return {'WGTP':group.sum()}
 
 table2_stacked = table2_grouped.apply(get_table_sums) 
 table2_stacked = table2_stacked/table2_df['WGTP'].sum()
@@ -97,14 +98,18 @@ table2.index.names = ['HHL - Household language']
 table2.rename(columns=access_text_descriptions, inplace=True)
 
 # Get sum column
-table2_row_sums = table2['sum','Yes w/ Subsrc.']+table2['sum','Yes, wo/ Subsrc.']+table2['sum','No']
+table2_row_sums = table2['WGTP','Yes w/ Subsrc.']+table2['WGTP','Yes, wo/ Subsrc.']+table2['WGTP','No']
 # Add sum_col to df
-table2['sum','All'] = table2_row_sums
+table2['WGTP','All'] = table2_row_sums
 
 # Get sum row
 table2.loc['All'] = table2.sum()
 
-print(table2)
+# Apply formatting to table2 values
+table2['WGTP','Yes w/ Subsrc.'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2['WGTP','Yes w/ Subsrc.']], index = table2.index)
+table2['WGTP','Yes, wo/ Subsrc.'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2['WGTP','Yes, wo/ Subsrc.']], index = table2.index)
+table2['WGTP','No'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2['WGTP','No']], index = table2.index)
+table2['WGTP','All'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2['WGTP','All']], index = table2.index)
 
 # TABLE 3: Quantile Analysis of HINCP
 # TODO Rows should correspond to different quantiles of HINCP: low (0-1/3), medium (1/3-2/3), high (2/3-1)
@@ -125,6 +130,6 @@ print(table2)
 
 # Table 2
 #print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
-
+#print(table2)
 # Table 3
 #print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***\n")
