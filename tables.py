@@ -56,6 +56,7 @@ table1['count'] = table1['count'].astype(int)
 table1['min'] = table1['min'].astype(int)
 table1['max'] = table1['max'].astype(int)
 
+
 # TABLE 2: HHL vs. ACCESS
 
 # Get DataFrame drop NA values
@@ -78,11 +79,20 @@ access_text_descriptions =  {
 # Get Groupby
 table2_grouped =  table2_df.groupby(['HHL','ACCESS']).sum()/table2_df['WGTP'].sum()
 
+# unstack dataframe
 table2 = table2_grouped.unstack(level=-1)
-print(table2)
-# Function for getting each column in group
 
-#print(table2)
+# Convert HHL values to text descriptions
+table2.rename(index=hhl_text_descriptions, inplace=True)
+
+# Rename header
+table2.index.names = ['HHL - Household language']
+
+# Convert ACCESS values to text descriptions
+table2.rename(columns=access_text_descriptions, inplace=True)
+
+print(table2)
+
 
 
 # TABLE 3: Quantile Analysis of HINCP
