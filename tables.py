@@ -15,18 +15,18 @@ pd.options.display.max_colwidth = 100
 pums_dataframe = pd.read_csv('ss13hil.csv')
 
 # TABLE 1: Statistics of HINCP, grouped by HHT
-# Get df for table1
-table1_df = pums_dataframe[['HINCP','HHT']].dropna()
-# Get grouped
-table1_grouped = table1_df['HINCP'].groupby(table1_df['HHT'])
 
+# Get grouped
+table1_grouped = pums_dataframe['HINCP'].groupby(pums_dataframe['HHT'])
+
+# Function for getting each column in group
 def get_table1(group):
     return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min(),'max':group.max()}
 
-# Apply
-table1 = table1_grouped.apply(get_table1)
+# Apply to grouped to get stacked dataframe
+table1_stacked = table1_grouped.apply(get_table1)
 
-# Convert HHT types to text descriptions
+# HHT descriptions by value
 hht_text_descriptions =  {
 1.0:'Married couple household',
 5.0:'Nonfamily household:Male householder:Not living alone',
@@ -36,20 +36,25 @@ hht_text_descriptions =  {
 4.0:'Nonfamily household:Male householder:Living alone',
 6.0:'Nonfamily household:Female householder:Living alone'}
 
-table1.rename(index=hht_text_descriptions, inplace=True)
+# Convert HHT values to text descriptions
+table1_stacked.rename(index=hht_text_descriptions, inplace=True)
 
-# unstack groupby into dataframe
-table1_table = table1.unstack(level=-1)
+# unstack dataframe
+table1 = table1_stacked.unstack(level=-1)
+
 # Sort by mean column descending
-table1_table.sort_values('mean',ascending=False, inplace=True)
+table1.sort_values('mean',ascending=False, inplace=True)
+
 # Rename header
-table1_table.index.names = ['HHT - Household/family type']
+table1.index.names = ['HHT - Household/family type']
+
 # Rearrange columns
-table1_table = table1_table[['mean','std','count','min','max']]
-# Get rid of dcimals on count min max
-table1_table['count'] = table1_table['count'].astype(int)
-table1_table['min'] = table1_table['min'].astype(int)
-table1_table['max'] = table1_table['max'].astype(int)
+table1 = table1[['mean','std','count','min','max']]
+
+# Get rid of decimals on count min max
+table1['count'] = table1['count'].astype(int)
+table1['min'] = table1['min'].astype(int)
+table1['max'] = table1['max'].astype(int)
 
 # TABLE 2: HHL vs. ACCESS
 # TODO Table should use the HHL types (text descriptions) as the index
@@ -75,7 +80,8 @@ print("PROGRAMMING ASSIGNMENT #7\n")
 
 # Table 1
 print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
-print(table1_table)
+print(table1)
+
 # Table 2
 #print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
 
