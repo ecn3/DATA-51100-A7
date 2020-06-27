@@ -12,12 +12,12 @@ import numpy as np
 pd.options.display.max_colwidth = 100
 
 # Load ss13hil.csv into a DATAFRAME
-pums_dataframe = pd.read_csv('ss13hil.csv')
+pums_df = pd.read_csv('ss13hil.csv')
 
 # TABLE 1: Statistics of HINCP, grouped by HHT
 
 # Get grouped
-table1_grouped = pums_dataframe['HINCP'].groupby(pums_dataframe['HHT'])
+table1_grouped = pums_df['HINCP'].groupby(pums_df['HHT'])
 
 # Function for getting each column in group
 def get_table1(group):
@@ -28,13 +28,13 @@ table1_stacked = table1_grouped.apply(get_table1)
 
 # HHT descriptions by value
 hht_text_descriptions =  {
-1.0:'Married couple household',
-5.0:'Nonfamily household:Male householder:Not living alone',
-7.0:'Nonfamily household:Female householder:Not living alone',
-2.0:'Other family household:Male householder, no wife present',
-3.0:'Other family household:Female householder, no husband present',
-4.0:'Nonfamily household:Male householder:Living alone',
-6.0:'Nonfamily household:Female householder:Living alone'}
+1:'Married couple household',
+2:'Other family household:Male householder, no wife present',
+3:'Other family household:Female householder, no husband present',
+4:'Nonfamily household:Male householder:Living alone',
+5:'Nonfamily household:Male householder:Not living alone',
+6:'Nonfamily household:Female householder:Living alone',
+7:'Nonfamily household:Female householder:Not living alone'}
 
 # Convert HHT values to text descriptions
 table1_stacked.rename(index=hht_text_descriptions, inplace=True)
@@ -57,13 +57,18 @@ table1['min'] = table1['min'].astype(int)
 table1['max'] = table1['max'].astype(int)
 
 # TABLE 2: HHL vs. ACCESS
-# TODO Table should use the HHL types (text descriptions) as the index
-# TODO Columns should be the text descriptions of ACCESS values
-''' TODO  Each table entry is the sum of WGTP column for the given HHL/ACCESS combination, 
-divided by the sum of WGTP values in the data.
-Entries need to be formatted as percentages.
-'''
-# TODO Any rows containing NA values in HHL, ACCESS, or WGTP columns should be excluded.
+
+# Get DataFrame drop NA values
+table2_df = pums_df[['HHL','ACCESS','WGTP']].dropna()
+
+# HHL descriptions by value
+hhl_text_descriptions =  {
+1:'English only',
+2:'Spanish',
+3:'Other Indo-European languages',
+4:'Asian and Pacific Island languages',
+5:'Other language'}
+
 
 # TABLE 3: Quantile Analysis of HINCP
 # TODO Rows should correspond to different quantiles of HINCP: low (0-1/3), medium (1/3-2/3), high (2/3-1)
@@ -74,13 +79,13 @@ Entries need to be formatted as percentages.
 
 # Display the tables to the screen
 # Header info
-print("DATA-51100-002, SUMMER 2020")
-print("Christian Nelson")
-print("PROGRAMMING ASSIGNMENT #7\n")
+#print("DATA-51100-002, SUMMER 2020")
+#print("Christian Nelson")
+#print("PROGRAMMING ASSIGNMENT #7\n")
 
 # Table 1
-print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
-print(table1)
+#print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
+#print(table1)
 
 # Table 2
 #print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
