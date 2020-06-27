@@ -69,6 +69,21 @@ hhl_text_descriptions =  {
 4:'Asian and Pacific Island languages',
 5:'Other language'}
 
+# ACCESS descriptions by value
+access_text_descriptions =  {
+1:'Yes w/ Subsrc.',
+2:'Yes, wo/ Subsrc.',
+3:'No'}
+
+# Get Groupby
+table2_grouped =  table2_df.groupby(['HHL','ACCESS']).sum()/table2_df['WGTP'].sum()
+
+table2 = table2_grouped.unstack(level=-1)
+print(table2)
+# Function for getting each column in group
+
+#print(table2)
+
 
 # TABLE 3: Quantile Analysis of HINCP
 # TODO Rows should correspond to different quantiles of HINCP: low (0-1/3), medium (1/3-2/3), high (2/3-1)
