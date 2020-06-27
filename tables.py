@@ -77,10 +77,15 @@ access_text_descriptions =  {
 3:'No'}
 
 # Get Groupby
-table2_grouped =  table2_df.groupby(['HHL','ACCESS']).sum()/table2_df['WGTP'].sum()
+table2_grouped =  table2_df.groupby(['HHL','ACCESS'])['WGTP']
 
-# unstack dataframe
-table2 = table2_grouped.unstack(level=-1)
+def get_table_sums(group):
+    return {'sum':group.sum()}
+
+table2_stacked = table2_grouped.apply(get_table_sums) 
+table2_stacked = table2_stacked/table2_df['WGTP'].sum()
+
+table2 = table2_stacked.unstack(level=-1).unstack(level=-1)
 
 # Convert HHL values to text descriptions
 table2.rename(index=hhl_text_descriptions, inplace=True)
@@ -91,9 +96,15 @@ table2.index.names = ['HHL - Household language']
 # Convert ACCESS values to text descriptions
 table2.rename(columns=access_text_descriptions, inplace=True)
 
+# Get sum column
+table2_row_sums = table2['sum','Yes w/ Subsrc.']+table2['sum','Yes, wo/ Subsrc.']+table2['sum','No']
+# Add sum_col to df
+table2['sum','All'] = table2_row_sums
+
+# Get sum row
+table2.loc['All'] = table2.sum()
+
 print(table2)
-
-
 
 # TABLE 3: Quantile Analysis of HINCP
 # TODO Rows should correspond to different quantiles of HINCP: low (0-1/3), medium (1/3-2/3), high (2/3-1)
