@@ -9,8 +9,7 @@ from pandas import Series, DataFrame
 import numpy as np
 
 # Output formating
-pd.set_option('display.max_columns',500)
-pd.set_option('display.width',1000)
+pd.options.display.max_colwidth = 100
 
 # Load ss13hil.csv into a DATAFRAME
 pums_dataframe = pd.read_csv('ss13hil.csv')
@@ -47,6 +46,10 @@ table1_table.sort_values('mean',ascending=False, inplace=True)
 table1_table.index.names = ['HHT - Household/family type']
 # Rearrange columns
 table1_table = table1_table[['mean','std','count','min','max']]
+# Get rid of dcimals on count min max
+table1_table['count'] = table1_table['count'].astype(int)
+table1_table['min'] = table1_table['min'].astype(int)
+table1_table['max'] = table1_table['max'].astype(int)
 
 # TABLE 2: HHL vs. ACCESS
 # TODO Table should use the HHL types (text descriptions) as the index
@@ -66,13 +69,13 @@ Entries need to be formatted as percentages.
 
 # Display the tables to the screen
 # Header info
-#print("DATA-51100-002, SUMMER 2020")
-#print("Christian Nelson")
-#print("PROGRAMMING ASSIGNMENT #7\n")
+print("DATA-51100-002, SUMMER 2020")
+print("Christian Nelson")
+print("PROGRAMMING ASSIGNMENT #7\n")
 
 # Table 1
-#print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***\n")
-
+print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
+print(table1_table)
 # Table 2
 #print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
 
