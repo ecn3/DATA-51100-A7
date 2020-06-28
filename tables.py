@@ -11,19 +11,16 @@ import numpy as np
 # Output formating
 pd.options.display.max_colwidth = 100
 
-
 # Load ss13hil.csv into a DATAFRAME
 pums_df = pd.read_csv('ss13hil.csv')
 
 # TABLE 1: Statistics of HINCP, grouped by HHT
-
 # Get grouped
 table1_grouped = pums_df['HINCP'].groupby(pums_df['HHT'])
 
 # Function for getting each column in group
 def get_table1(group):
     return {'mean':group.mean(),'std':group.std(),'count':group.count(),'min':group.min(),'max':group.max()}
-
 # Apply to grouped to get stacked dataframe
 table1_stacked = table1_grouped.apply(get_table1)
 
@@ -57,9 +54,7 @@ table1['count'] = table1['count'].astype(int)
 table1['min'] = table1['min'].astype(int)
 table1['max'] = table1['max'].astype(int)
 
-
 # TABLE 2: HHL vs. ACCESS
-
 # Get DataFrame drop NA values
 table2_df = pums_df[['HHL','ACCESS','WGTP']].dropna()
 
@@ -70,7 +65,6 @@ hhl_text_descriptions =  {
 3:'Other Indo-European languages',
 4:'Asian and Pacific Island languages',
 5:'Other language'}
-
 # ACCESS descriptions by value
 access_text_descriptions =  {
 1:'Yes w/ Subsrc.',
@@ -79,13 +73,14 @@ access_text_descriptions =  {
 
 # Get Groupby
 table2_grouped =  table2_df.groupby(['HHL','ACCESS'])['WGTP']
-
+# Function for getting sums of each group
 def get_table_sums(group):
     return {'WGTP':group.sum()}
-
+# Apply the sum and divide it by the sum of WGTP
 table2_stacked = table2_grouped.apply(get_table_sums) 
 table2_stacked = table2_stacked/table2_df['WGTP'].sum()
 
+# Unstack the table
 table2 = table2_stacked.unstack(level=-1).unstack(level=-1)
 
 # Convert HHL values to text descriptions
@@ -114,23 +109,20 @@ table2['WGTP','All'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2
 # TABLE 3: Quantile Analysis of HINCP
 # Get DataFrame drop NA values
 table3_df = pums_df[['HINCP','WGTP']].dropna()
-
 # Get Groupby
 table3_grouped =  table3_df.groupby(pd.qcut(table3_df['HINCP'], 3, labels=["low", "medium", "high"]))
 
-
+# Function for getting stats by group
 def get_table3_columns(group):
     return {'min':group.min(),'max':group.max(),'mean':group.mean(),'household_count':group['WGTP'].sum()}
-
 # Apply to grouped to get stacked dataframe
 table3_stacked = table3_grouped.apply(get_table3_columns)
 
 # Get rid of range to clean quartile data
 def get_cleaned_values(quartile):
     return {'min':quartile['min'][0],'max':quartile['max'][0],'mean':quartile['mean'][0].round(6),'household_count':quartile['household_count']}
-    #return {quartile['min'][0],quartile['max'][0],quartile['mean'][0].round(6),quartile['household_count']}
 
-# Reset values
+# Reset values to clean values not ranged
 table3_stacked['low'] = get_cleaned_values(table3_stacked['low'])
 table3_stacked['medium'] = get_cleaned_values(table3_stacked['medium'])
 table3_stacked['high'] = get_cleaned_values(table3_stacked['high'])
@@ -140,7 +132,7 @@ q1_list = table3_stacked['low'].values()
 q2_list = table3_stacked['medium'].values()
 q3_list = table3_stacked['high'].values()
 
-# Create new dataframe
+# Create new dataframe with proper data layout not sets
 table3 = pd.DataFrame({
     'min':[q1_list[3],q2_list[3],q3_list[3]],
     'max':[q1_list[0],q2_list[0],q3_list[0]],
