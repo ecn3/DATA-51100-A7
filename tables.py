@@ -112,9 +112,22 @@ table2['WGTP','No'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2[
 table2['WGTP','All'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2['WGTP','All']], index = table2.index)
 
 # TABLE 3: Quantile Analysis of HINCP
-# TODO Rows should correspond to different quantiles of HINCP: low (0-1/3), medium (1/3-2/3), high (2/3-1)
-# TODO Columns displayed should be: min, max, mean, household_count
-# TODO The household_count column contains entries with the sum of WGTP values for the corresponding range of HINCP values (low, medium, or high)
+# Get DataFrame drop NA values
+table3_df = pums_df[['HINCP','WGTP']].dropna()
+
+# Break rows into quartiles
+#table3_quartiles = pd.cut(table3_df['HINCP'],3, labels=["low", "medium", "high"])
+#table3_df['HINCP'] = table3_quartiles
+
+# Get Groupby
+table3_grouped =  table3_df.groupby(pd.qcut(table3_df['HINCP'], 3, labels=["low", "medium", "high"]))
+def get_table3(group):
+    return {'min':group.min(),'max':group.max(),'mean':group.max(),'household_count':group['WGTP'].sum()}
+
+# Apply to grouped to get stacked dataframe
+table3_stacked = table3_grouped.apply(get_table3)
+
+print(table3_stacked)
 
 # OUTPUT
 
@@ -130,6 +143,7 @@ table2['WGTP','All'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2
 
 # Table 2
 #print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
+#print("                                              sum")
 #print(table2)
 # Table 3
 #print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***\n")
