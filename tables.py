@@ -128,30 +128,52 @@ table3_stacked = table3_grouped.apply(get_table3_columns)
 # Get rid of range to clean quartile data
 def get_cleaned_values(quartile):
     return {'min':quartile['min'][0],'max':quartile['max'][0],'mean':quartile['mean'][0].round(6),'household_count':quartile['household_count']}
+    #return {quartile['min'][0],quartile['max'][0],quartile['mean'][0].round(6),quartile['household_count']}
 
 # Reset values
 table3_stacked['low'] = get_cleaned_values(table3_stacked['low'])
 table3_stacked['medium'] = get_cleaned_values(table3_stacked['medium'])
 table3_stacked['high'] = get_cleaned_values(table3_stacked['high'])
 
+# Break up data
+q1_list = table3_stacked['low'].values()
+q2_list = table3_stacked['medium'].values()
+q3_list = table3_stacked['high'].values()
 
-print(table3_stacked)
+# Create new dataframe
+table3 = pd.DataFrame({
+    'min':[q1_list[3],q2_list[3],q3_list[3]],
+    'max':[q1_list[0],q2_list[0],q3_list[0]],
+    'mean':[q1_list[1],q2_list[1],q3_list[1]],
+    'household_count':[q1_list[2],q2_list[2],q3_list[2]]}, index=['low','medium','high'])
+
+# Rearrange columns
+table3 = table3[['min','max','mean','household_count']]
+
+# Add in title
+table3.index.name = 'HINCP'
 
 # OUTPUT
 
 # Display the tables to the screen
 # Header info
-#print("DATA-51100-002, SUMMER 2020")
-#print("Christian Nelson")
-#print("PROGRAMMING ASSIGNMENT #7\n")
+print("DATA-51100-002, SUMMER 2020")
+print("Christian Nelson")
+print("PROGRAMMING ASSIGNMENT #7\n")
 
 # Table 1
-#print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
-#print(table1)
+print("*** Table 1 - Descriptive Statistics of HINCP, grouped by HHT ***")
+print(table1)
+# Newline
+print("")
 
 # Table 2
-#print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***\n")
-#print("                                              sum")
-#print(table2)
+print("*** Table 2 - HHL vs. ACCESS - Frequency Table ***")
+print("                                              sum")
+print(table2)
+# Newline
+print("")
+
 # Table 3
-#print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***\n")
+print("*** Table 3 - Quantile Analysis of HINCP - Household income (past 12 months) ***")
+print(table3)
