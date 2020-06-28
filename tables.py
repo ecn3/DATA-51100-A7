@@ -115,17 +115,25 @@ table2['WGTP','All'] = pd.Series(["{0:.2f}%".format(val * 100) for val in table2
 # Get DataFrame drop NA values
 table3_df = pums_df[['HINCP','WGTP']].dropna()
 
-# Break rows into quartiles
-#table3_quartiles = pd.cut(table3_df['HINCP'],3, labels=["low", "medium", "high"])
-#table3_df['HINCP'] = table3_quartiles
-
 # Get Groupby
 table3_grouped =  table3_df.groupby(pd.qcut(table3_df['HINCP'], 3, labels=["low", "medium", "high"]))
-def get_table3(group):
-    return {'min':group.min(),'max':group.max(),'mean':group.max(),'household_count':group['WGTP'].sum()}
+
+
+def get_table3_columns(group):
+    return {'min':group.min(),'max':group.max(),'mean':group.mean(),'household_count':group['WGTP'].sum()}
 
 # Apply to grouped to get stacked dataframe
-table3_stacked = table3_grouped.apply(get_table3)
+table3_stacked = table3_grouped.apply(get_table3_columns)
+
+# Get rid of range to clean quartile data
+def get_cleaned_values(quartile):
+    return {'min':quartile['min'][0],'max':quartile['max'][0],'mean':quartile['mean'][0].round(6),'household_count':quartile['household_count']}
+
+# Reset values
+table3_stacked['low'] = get_cleaned_values(table3_stacked['low'])
+table3_stacked['medium'] = get_cleaned_values(table3_stacked['medium'])
+table3_stacked['high'] = get_cleaned_values(table3_stacked['high'])
+
 
 print(table3_stacked)
 
